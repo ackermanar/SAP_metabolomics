@@ -22,7 +22,7 @@ SAP_metabolomics/
 │   ├── statistical_analysis.R         # T-tests and comparative statistics
 │   └── visualization.R                # Figure generation scripts
 ├── data/
-│   ├── SAP19_MET_V4_ImputeChecks_NoBlanks.csv    # Primary metabolomics dataset
+│   ├── SAP19_MET.csv    # Primary metabolomics dataset
 │   ├── phenotype_data/                 # Morphological and disease phenotypes
 │   └── processed/                      # Intermediate analysis files
 ├── outputs/
