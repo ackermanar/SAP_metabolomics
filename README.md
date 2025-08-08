@@ -4,6 +4,10 @@
 
 This repository contains code and analysis pipelines for **"The Organizational Trends of the Grain Metabolome in the Sorghum Association Panel"** by Ackerman et al. The study applies non-targeted LC-MS metabolomics to understand the biochemical architecture of sorghum grain across 407 diverse accessions from the Sorghum Association Panel (SAP), with special focus on metabolic responses to *Fusarium* grain mold infection.
 
+## Manuscript URL
+
+https://www.sciencedirect.com/science/article/abs/pii/S0981942825008393
+
 ### Research Highlights
 
 - **Comprehensive metabolomic profiling** of 407 sorghum accessions representing global genetic diversity
