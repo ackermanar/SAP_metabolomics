@@ -19,10 +19,10 @@ SAP_metabolomics/
 ├── scripts/
 │   ├── enrichment_analysis.R          # Main mummichog pathway enrichment pipeline
 │   ├── SAP__Met_Figures.R             # Publication figure generation pipeline
-├── data/                              # DATA NOT INCLUDED - Download from AWS
+├── data/                              # DATA NOT INCLUDED - Download from cloud
 │   ├── raw/
-│   │   ├── treated_TAMU_met/          # Fusarium-inoculated Tx2911 and P850029 samples (TAMU analysis)
-│   │   └── untreated_CU_met/          # Entire SAP (Clemson analysis)
+│   │   ├── treated_TAMU_met/          # Fusarium-inoculated samples, Tx2911 and P850029 (TAMU analysis)
+│   │   └── untreated_CU_met/          # Untreated SAP (Clemson analysis)
 │   └── processed/
 │       ├── Fig1/                      # Race-based pathway enrichment data
 │       ├── Fig2/                      # Panicle structure metabolomic profiles
@@ -38,7 +38,7 @@ SAP_metabolomics/
 
 ## Data Access
 
-⚠️ **Important**: Data files are **NOT** included in this GitHub repository due to size constraints. All datasets must be downloaded separately from AWS S3.
+⚠️ **Important**: Data files are **NOT** included in this GitHub repository due to size constraints. All datasets must be downloaded separately from cloud storage.
 
 ### Download Instructions
 
@@ -58,7 +58,7 @@ curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 
 Replace `filename` with the specific file you need.
 
-#### Option 2: Download Entire Dataset (Recommended)
+#### Option 2: Download Entire Dataset via AWS CLI (Recommended)
 
 For the complete dataset, use AWS CLI:
 
@@ -70,6 +70,21 @@ aws s3 sync s3://sapmet/SAP_Metabolomics/ ./SAP_Metabolomics
 https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
 
 *Note: No AWS credentials needed for this public dataset - use `aws configure` with dummy values if prompted.*
+
+#### Option 3: Download Entire Dataset via Google Cloud CLI
+
+Alternatively, use Google Cloud Storage with gsutil:
+
+```bash
+gsutil -m cp -r \
+  "gs://sapmet/SAP_Metabolomics" \
+  .
+```
+
+**Google Cloud CLI Setup Required**: Install and configure gcloud CLI first. See instructions at:
+https://cloud.google.com/storage/docs/discover-object-storage-gcloud
+
+*Note: No authentication required for this public dataset.*
 
 #### Create Directory Structure
 
@@ -91,8 +106,8 @@ mkdir -p SAP_Metabolomics/data/processed/Supplemental
 ### Data Organization
 
 **Raw Datasets (`data/raw/`):**
-- `treated_TAMU_met/`: *Fusarium verticillioides*-inoculated samples analyzed at Texas A&M University Integrated Metabolomic Analysis Core (IMAC) 
-- `untreated_CU_met/`: Control samples from uninoculated field trials analyzed at Clemson University Multi-User Analytics and Metabolomics Lab (MUAL)
+- treated_TAMU_met/: Fusarium verticillioides-inoculated samples analyzed at Texas A&M University Integrated Metabolomic Analysis Core (IMAC) 
+- untreated_CU_met/: Control samples from uninoculated field trials analyzed at Clemson University Multi-User Analytics and Metabolomics Lab (MUAL)
 
 **Processed Data by Figure (`data/processed/`):**
 - `Fig1/`: Pathway enrichment results across sorghum races and check lines (Tx2911, P850029)
@@ -111,7 +126,7 @@ If downloading individual files, get these key datasets first:
 
 ```bash
 # Main metabolomics dataset
-wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Fig1/SAP19_MET.csv
 
 # Sample metadata
 wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Supplemental/SAP_accession_metadata.csv
@@ -245,15 +260,18 @@ library(viridis)
 git clone https://github.com/username/SAP_metabolomics.git
 cd SAP_metabolomics
 
-# Option A: Download entire dataset (recommended)
+# Option A: Download entire dataset via AWS CLI (recommended)
 aws s3 sync s3://sapmet/SAP_Metabolomics/ ./SAP_Metabolomics
 
-# Option B: Create structure and download individual files
+# Option B: Download entire dataset via Google Cloud CLI
+gsutil -m cp -r "gs://sapmet/SAP_Metabolomics" .
+
+# Option C: Create structure and download individual files
 mkdir -p data/raw/{treated_TAMU_met,untreated_CU_met}
 mkdir -p data/processed/{Fig1,Fig2,Fig3,Fig4,Fig5,Fig6,Fig7,Fig8,Supplemental}
 
 # Download key files individually
-wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv \
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Fig1/SAP19_MET.csv \
      -P data/processed/Fig1/
 ```
 
@@ -286,7 +304,7 @@ setwd("SAP_Metabolomics")
 plan(multisession, workers = (detectCores()-2))
 
 # Load and format data
-met <- fread("data/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv")
+met <- fread("data/processed/Fig1/SAP19_MET.csv")
 
 # Define subpopulations (minimum n=5)
 sum <- met %>% 
@@ -384,5 +402,9 @@ For questions about the methodology or code implementation:
 - **Primary Contact**: Arlyn Ackerman (aja294@cornell.edu)
 - **Issues**: Submit via GitHub Issues
 - **Methodology Questions**: See `docs/methodology.md` for detailed protocols
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
