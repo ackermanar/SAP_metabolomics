@@ -5,7 +5,7 @@ This directory contains the data structure for the SAP Metabolomics project, but
 
 ## Download Required Data
 
-All data files must be downloaded from AWS S3. You have several options:
+All data files must be downloaded from cloud storage using the following commands:
 
 ### Option 1: Download Individual Files
 
@@ -23,7 +23,7 @@ curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 
 Replace `filename` with the specific file you need from the directory structure below.
 
-### Option 2: Download Entire Dataset (Recommended)
+### Option 2: Download Entire Dataset via AWS CLI (Recommended)
 
 For the complete dataset, use AWS CLI:
 
@@ -36,6 +36,21 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
 
 *Note: No AWS credentials needed for this public dataset - use `aws configure` with dummy values if prompted.*
 
+### Option 3: Download Entire Dataset via Google Cloud CLI
+
+Alternatively, use Google Cloud Storage with gsutil:
+
+```bash
+gsutil -m cp -r \
+  "gs://sapmet/SAP_Metabolomics" \
+  .
+```
+
+**Google Cloud CLI Setup Required:** Install and configure gcloud CLI first. See instructions at:
+https://cloud.google.com/storage/docs/discover-object-storage-gcloud
+
+*Note: No authentication required for this public dataset.*
+
 ## Directory Structure
 
 After downloading, your data directory should look like this:
@@ -43,8 +58,8 @@ After downloading, your data directory should look like this:
 ```
 data/
 ├── raw/
-│   ├── treated_TAMU_met/          # Fusarium-inoculated samples
-│   └── untreated_CU_met/          # Control samples
+│   ├── treated_TAMU_met/          # Fusarium-inoculated samples (TAMU IMAC)
+│   └── untreated_CU_met/          # Control samples (Clemson MUAL)
 └── processed/
     ├── Fig1/                      # Race-based pathway enrichment data
     ├── Fig2/                      # Panicle structure analysis
@@ -57,9 +72,14 @@ data/
     └── Supplemental/              # Additional datasets
 ```
 
+### Raw Dataset Details
+
+- **treated_TAMU_met/**: *Fusarium verticillioides*-inoculated samples analyzed at Texas A&M University Integrated Metabolomic Analysis Core (IMAC)
+- **untreated_CU_met/**: Control samples from uninoculated field trials analyzed at Clemson University Multi-User Analytics and Metabolomics Lab (MUAL)
+
 ## Essential Files for Basic Analysis
 
-If downloading individual files, get these key datasets first:
+Download these key files first to run the main analyses:
 
 1. `processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv` - Main metabolomics dataset
 2. `processed/Supplemental/SAP_accession_metadata.csv` - Sample metadata
@@ -67,7 +87,7 @@ If downloading individual files, get these key datasets first:
 
 ## File Listing
 
-For a complete list of available files, contact the authors or check the AWS S3 bucket directly.
+For a complete list of available files, contact the authors or check the cloud storage buckets directly.
 
 ⚠️ **Important**: The scripts expect data files to be in these exact directory locations. Make sure to download files to the correct subdirectories.
 
