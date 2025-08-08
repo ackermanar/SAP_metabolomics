@@ -1,4 +1,4 @@
-# Create metaboanlyst mummichog-ready tables from SAP19_MET_V4_ImputeChecks_NoBlanks.csv using zea mays KEGG
+# Create metaboanlyst mummichog-ready tables from SAP19_MET.csv using zea mays KEGG
 
 library(magrittr)
 library(data.table)
@@ -13,10 +13,10 @@ library(tidyverse)
 library(memoise)
 
 # Set working directory to your path
-setwd("~/Documents/MetaboAnalystR/")
+setwd("SAP_Metabolomics")
 
 # Upload csv
-met <- fread("SAP19_MET_V4_ImputeChecks_NoBlanks.csv")
+met <- fread("./data/raw/untreated_CU_met/SAP19_MET.csv")
 
 # Set up for parallel computation
 plan(multisession, workers = (detectCores()-2)) # Use half of available cores 
