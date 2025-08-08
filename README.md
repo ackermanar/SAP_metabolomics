@@ -18,21 +18,73 @@ This repository contains code and analysis pipelines for **"The Organizational T
 SAP_metabolomics/
 ├── scripts/
 │   ├── enrichment_analysis.R          # Main mummichog pathway enrichment pipeline
-│   ├── data_preprocessing.R            # Data cleaning and normalization
-│   ├── statistical_analysis.R         # T-tests and comparative statistics
-│   └── visualization.R                # Figure generation scripts
-├── data/
-│   ├── SAP19_MET.csv    # Primary metabolomics dataset
-│   ├── phenotype_data/                 # Morphological and disease phenotypes
-│   └── processed/                      # Intermediate analysis files
-├── outputs/
-│   ├── pathway_enrichment/             # Mummichog analysis results
-│   ├── figures/                        # Publication-ready plots
-│   └── supplementary/                  # Additional analysis outputs
-├── docs/
-│   ├── methodology.md                  # Detailed analytical protocols
-│   └── data_dictionary.md              # Variable definitions and units
+│   ├── SAP__Met_Figures.R             # Publication figure generation pipeline
+├── data/                              # DATA NOT INCLUDED - Download from AWS
+│   ├── raw/
+│   │   ├── treated_TAMU_met/          # Treated, Fusarium-inoculated samples (TAMU analysis)
+│   │   └── untreated_CU_met/          # Untreated samples (Clemson analysis)
+│   └── processed/
+│       ├── Fig1/                      # Race-based pathway enrichment data
+│       ├── Fig2/                      # Panicle structure metabolomic profiles
+│       ├── Fig3/                      # Grain color pathway analysis
+│       ├── Fig4/                      # Disease phenotype correlations
+│       ├── Fig5/                      # PCA and metabolomic clustering
+│       ├── Fig6/                      # Network-level pathway analysis
+│       ├── Fig7/                      # Volcano plot differential metabolites
+│       ├── Fig8/                      # Partial correlation heatmaps
+│       └── Supplemental/              # Additional datasets and analyses
 └── README.md
+```
+
+## Data Access
+
+⚠️ **Important**: Data files are **NOT** included in this GitHub repository due to size constraints. All datasets must be downloaded separately from AWS S3.
+
+### Download Instructions
+
+Create the required directory structure and download data using:
+
+```bash
+
+# Download individual files using wget
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
+
+# Or using curl
+curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
+```
+
+### Data Organization
+
+**Raw Datasets (`data/raw/`):**
+- `treated_TAMU_met/`: *Fusarium verticillioides*-inoculated samples analyzed at Texas A&M University IMAC
+- `untreated_CU_met/`: Control samples from uninoculated field trials analyzed at Clemson University
+
+**Processed Data by Figure (`data/processed/`):**
+- `Fig1/`: Pathway enrichment results across sorghum races and check lines (Tx2911, P850029)
+- `Fig2/`: Metabolomic pathway analysis by panicle structure (compact, semi-compact, open)
+- `Fig3/`: Grain color-associated metabolic pathway enrichment
+- `Fig4/`: Disease phenotype data (PGMSR, fumonisin, FSDI) with metabolomic correlations
+- `Fig5/`: Principal component analysis of treated vs. untreated metabolomes
+- `Fig6/`: Network-level pathway fold-change analysis between genotypes
+- `Fig7/`: Volcano plot data for differential metabolite abundance
+- `Fig8/`: Partial correlation matrices with phenotype associations
+- `Supplemental/`: Extended datasets, accession metadata, and additional analyses
+
+### Required Files
+
+Before running analyses, ensure you have downloaded the necessary data files to their respective directories:
+
+```bash
+# Essential datasets for pathway enrichment analysis
+data/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv
+data/processed/Supplemental/SAP_accession_metadata.csv
+
+# Raw metabolomics data for advanced analyses
+data/raw/treated_TAMU_met/[metabolomics_files]
+data/raw/untreated_CU_met/[metabolomics_files]
+
+# Figure-specific processed datasets
+data/processed/Fig[1-8]/[analysis_specific_files]
 ```
 
 ## Key Analysis Pipeline
@@ -59,14 +111,50 @@ met_ttest_safe <- safely(met_ttest, quiet = TRUE)
 map2(met_list, jobs, ~met_ttest_safe(.x, .y))
 ```
 
-### 2. Data Processing Workflow
+### 2. Publication Figure Generation (`SAP__Met_Figures.R`)
+
+Comprehensive visualization pipeline for creating all manuscript figures with publication-ready formatting and consistent aesthetics.
+
+**Figure Generation Capabilities:**
+- **Figure 1**: Race-based pathway enrichment bubble plots with sample size annotations
+- **Figure 2**: Panicle structure metabolomic pathway analysis with color-coded significance
+- **Figure 3**: Grain color pathway enrichment visualization
+- **Figure 4**: Disease phenotype scatter plots (PGMSR vs. fumonisin with FSDI sizing)
+- **Figure 5**: Principal Component Analysis plots with statistical ellipses
+- **Figure 6**: Network-level pathway bar charts with fold-change directionality
+- **Figure 7**: Enhanced volcano plots with metabolite class annotations and selective labeling
+- **Figure 8**: Correlation heatmaps with phenotype annotations and hierarchical clustering
+- **Supplementary Figure 1**: Multi-panel morphological trait distribution plots
+
+**Key Visualization Features:**
+```r
+# Automated sample size annotation for bubble plots
+merged_counts$Label <- paste(merged_counts$RACE, "\n (n = ", merged_counts$Count, ")", sep = "")
+
+# Publication-ready color schemes
+scale_color_gradient2(low = "lightblue1", mid = "lightskyblue", high = "dodgerblue4")
+
+# Enhanced volcano plots with selective metabolite labeling
+EnhancedVolcano(selectLab = c('Luteolin','Apigeninidin', 'Caffeic_Acid', 'Salicylic_acid'))
+
+# Correlation heatmaps with custom annotations
+pheatmap(annotation_col = metadata, annotation_row = rowData, cluster_cols = FALSE)
+```
+
+**Output Management:**
+- **Multiple resolution options**: Small (7"×6") and large (14"×12") format exports
+- **High-quality TIFF export**: 300 DPI publication-ready figures
+- **Consistent theming**: Standardized fonts, colors, and layouts across all figures
+- **Automated file naming**: Systematic figure file organization
+
+### 3. Data Processing Workflow
 
 1. **Quality Control**: Filter features, normalize data using QuantileNorm + LogNorm + AutoNorm
 2. **Statistical Testing**: T-tests comparing each subpopulation against remainder of SAP
 3. **Pathway Prediction**: Mummichog v2 algorithm with retention time integration
 4. **Results Compilation**: Automated aggregation across all subpopulations
 
-### 3. Metabolomic Network Analysis
+### 4. Metabolomic Network Analysis
 
 - **Feature-Based Molecular Networking (FBMN)** for compound annotation
 - **Network Annotation Propagation (NAP)** for unknown compound prediction
@@ -78,9 +166,9 @@ map2(met_list, jobs, ~met_ttest_safe(.x, .y))
 ### R Packages
 ```r
 # Core data manipulation and analysis
-library(magrittr)
 library(data.table)
 library(tidyverse)
+library(magrittr)
 
 # Parallel processing
 library(purrr)
@@ -91,10 +179,23 @@ library(parallel)
 # Metabolomics analysis
 library(MetaboAnalystR)
 library(RJSONIO)
-
-# Statistical modeling
 library(fitdistrplus)
 library(memoise)
+
+# Visualization and figure generation
+library(pheatmap)
+library(grid)
+library(gridExtra)
+library(ggforce)
+library(EnhancedVolcano)
+
+# Statistical analysis
+library(ppcor)
+
+# Color palettes and themes
+library(wesanderson)
+library(RColorBrewer)
+library(viridis)
 ```
 
 ### External Tools
@@ -104,6 +205,44 @@ library(memoise)
 
 ## Usage
 
+### Setup and Data Download
+
+```bash
+# Clone repository
+git clone https://github.com/username/SAP_metabolomics.git
+cd SAP_metabolomics
+
+# Create data directory structure
+mkdir -p data/raw/{treated_TAMU_met,untreated_CU_met}
+mkdir -p data/processed/{Fig1,Fig2,Fig3,Fig4,Fig5,Fig6,Fig7,Fig8,Supplemental}
+
+# Download required datasets (example)
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/SAP19_MET_V4_ImputeChecks_NoBlanks.csv \
+     -P data/processed/Fig1/
+```
+
+### Generating Publication Figures
+
+```r
+# Load figure generation script
+source("scripts/SAP__Met_Figures.R")
+
+# Set working directory
+setwd("SAP_Metabolomics")
+
+# Generate individual figures (examples)
+# Figure 1: Race-based pathway enrichment
+# (Automatically reads data/processed/Fig1/final_peak_list_RACE.csv)
+
+# Figure 4: Disease phenotype correlations
+# (Reads data/raw/field_data/SGM_DATA.csv)
+
+# Figure 7: Volcano plot with enhanced annotations
+# (Uses data/processed/Fig7/Data/Tx2911upreg.csv)
+
+# All figures are automatically saved as high-resolution TIFF files
+```
+
 ### Basic Pathway Enrichment Analysis
 
 ```r
@@ -111,7 +250,7 @@ library(memoise)
 plan(multisession, workers = (detectCores()-2))
 
 # Load and format data
-met <- fread("SAP19_MET_V4_ImputeChecks_NoBlanks.csv")
+met <- fread("data/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv")
 
 # Define subpopulations (minimum n=5)
 sum <- met %>% 
@@ -129,19 +268,20 @@ final_results <- peak_lists %>%
   rbindlist()
 ```
 
-### Customizing for Different Grouping Variables
-
-Simply modify the `group_by()` statement to analyze different categorical variables:
+### Customizing Visualizations
 
 ```r
-# For panicle structure analysis
-sum <- met %>% group_by(PANICLE_STRUCTURE) %>% summarize(n())
+# Modify color schemes for different analyses
+scale_color_manual(values = c("Tx2911" = "darkorange2", "P850029" = "dodgerblue2"))
 
-# For grain color analysis  
-sum <- met %>% group_by(GRAIN_COLOR) %>% summarize(n())
+# Adjust figure dimensions for different layouts
+ggsave("custom_figure.tiff", device = "tiff", width = 10, height = 8, dpi = 300)
 
-# For combined variables
-sum <- met %>% group_by(RACE, PANICLE_STRUCTURE) %>% summarize(n())
+# Customize heatmap annotations
+ann_colors <- list(
+    Label = c("P85" = "dodgerblue2", "Tx2911" = "darkorange2"),
+    P.value = c("Significant" = "chartreuse2", "Insignificant" = "coral2")
+)
 ```
 
 ## Data Requirements
@@ -207,9 +347,4 @@ For questions about the methodology or code implementation:
 
 - **Primary Contact**: Arlyn Ackerman (aja294@cornell.edu)
 - **Issues**: Submit via GitHub Issues
-- **Methodology Questions**: See `docs/methodology.md` for detailed protocols
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
