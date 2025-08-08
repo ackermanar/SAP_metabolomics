@@ -5,19 +5,36 @@ This directory contains the data structure for the SAP Metabolomics project, but
 
 ## Download Required Data
 
-All data files must be downloaded from AWS S3 using the following commands:
+All data files must be downloaded from AWS S3. You have several options:
 
-### Using wget:
+### Option 1: Download Individual Files
+
+For specific files, use wget or curl:
+
+**Using wget:**
 ```bash
 wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 ```
 
-### Using curl:
+**Using curl:**
 ```bash
 curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 ```
 
 Replace `filename` with the specific file you need from the directory structure below.
+
+### Option 2: Download Entire Dataset (Recommended)
+
+For the complete dataset, use AWS CLI:
+
+```bash
+aws s3 sync s3://sapmet/SAP_Metabolomics/ ./SAP_Metabolomics
+```
+
+**AWS CLI Setup Required:** Install and configure AWS CLI first. See instructions at:
+https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+
+*Note: No AWS credentials needed for this public dataset - use `aws configure` with dummy values if prompted.*
 
 ## Directory Structure
 
@@ -26,8 +43,8 @@ After downloading, your data directory should look like this:
 ```
 data/
 ├── raw/
-│   ├── treated_TAMU_met/          # Treated Tx2911 and P850029, analyzed at TAMU
-│   └── untreated_CU_met/          # Untreated SAP, analyzed at Clemson University
+│   ├── treated_TAMU_met/          # Fusarium-inoculated samples
+│   └── untreated_CU_met/          # Control samples
 └── processed/
     ├── Fig1/                      # Race-based pathway enrichment data
     ├── Fig2/                      # Panicle structure analysis
@@ -39,6 +56,14 @@ data/
     ├── Fig8/                      # Correlation matrices
     └── Supplemental/              # Additional datasets
 ```
+
+## Essential Files for Basic Analysis
+
+If downloading individual files, get these key datasets first:
+
+1. `processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv` - Main metabolomics dataset
+2. `processed/Supplemental/SAP_accession_metadata.csv` - Sample metadata
+3. `raw/field_data/SGM_DATA.csv` - Disease phenotype data
 
 ## File Listing
 
