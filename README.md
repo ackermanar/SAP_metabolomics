@@ -21,8 +21,8 @@ SAP_metabolomics/
 │   ├── SAP__Met_Figures.R             # Publication figure generation pipeline
 ├── data/                              # DATA NOT INCLUDED - Download from AWS
 │   ├── raw/
-│   │   ├── treated_TAMU_met/          # Treated, Fusarium-inoculated samples (TAMU analysis)
-│   │   └── untreated_CU_met/          # Untreated samples (Clemson analysis)
+│   │   ├── treated_TAMU_met/          # Fusarium-inoculated Tx2911 and P850029 samples (TAMU analysis)
+│   │   └── untreated_CU_met/          # Entire SAP (Clemson analysis)
 │   └── processed/
 │       ├── Fig1/                      # Race-based pathway enrichment data
 │       ├── Fig2/                      # Panicle structure metabolomic profiles
@@ -42,22 +42,57 @@ SAP_metabolomics/
 
 ### Download Instructions
 
-Create the required directory structure and download data using:
+You have several options for downloading the required data:
+
+#### Option 1: Download Individual Files
+
+For specific files, use wget or curl:
 
 ```bash
-
-# Download individual files using wget
+# Using wget
 wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 
-# Or using curl
+# Using curl
 curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
+```
+
+Replace `filename` with the specific file you need.
+
+#### Option 2: Download Entire Dataset (Recommended)
+
+For the complete dataset, use AWS CLI:
+
+```bash
+aws s3 sync s3://sapmet/SAP_Metabolomics/ ./SAP_Metabolomics
+```
+
+**AWS CLI Setup Required**: Install and configure AWS CLI first. See instructions at:
+https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+
+*Note: No AWS credentials needed for this public dataset - use `aws configure` with dummy values if prompted.*
+
+#### Create Directory Structure
+
+```bash
+# Create directory structure
+mkdir -p SAP_Metabolomics/data/raw/treated_TAMU_met
+mkdir -p SAP_Metabolomics/data/raw/untreated_CU_met
+mkdir -p SAP_Metabolomics/data/processed/Fig1
+mkdir -p SAP_Metabolomics/data/processed/Fig2
+mkdir -p SAP_Metabolomics/data/processed/Fig3
+mkdir -p SAP_Metabolomics/data/processed/Fig4
+mkdir -p SAP_Metabolomics/data/processed/Fig5
+mkdir -p SAP_Metabolomics/data/processed/Fig6
+mkdir -p SAP_Metabolomics/data/processed/Fig7
+mkdir -p SAP_Metabolomics/data/processed/Fig8
+mkdir -p SAP_Metabolomics/data/processed/Supplemental
 ```
 
 ### Data Organization
 
 **Raw Datasets (`data/raw/`):**
-- `treated_TAMU_met/`: *Fusarium verticillioides*-inoculated samples analyzed at Texas A&M University IMAC
-- `untreated_CU_met/`: Control samples from uninoculated field trials analyzed at Clemson University
+- `treated_TAMU_met/`: *Fusarium verticillioides*-inoculated samples analyzed at Texas A&M University Integrated Metabolomic Analysis Core (IMAC) 
+- `untreated_CU_met/`: Control samples from uninoculated field trials analyzed at Clemson University Multi-User Analytics and Metabolomics Lab (MUAL)
 
 **Processed Data by Figure (`data/processed/`):**
 - `Fig1/`: Pathway enrichment results across sorghum races and check lines (Tx2911, P850029)
@@ -70,21 +105,19 @@ curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 - `Fig8/`: Partial correlation matrices with phenotype associations
 - `Supplemental/`: Extended datasets, accession metadata, and additional analyses
 
-### Required Files
+### Essential Files for Basic Analysis
 
-Before running analyses, ensure you have downloaded the necessary data files to their respective directories:
+If downloading individual files, get these key datasets first:
 
 ```bash
-# Essential datasets for pathway enrichment analysis
-data/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv
-data/processed/Supplemental/SAP_accession_metadata.csv
+# Main metabolomics dataset
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv
 
-# Raw metabolomics data for advanced analyses
-data/raw/treated_TAMU_met/[metabolomics_files]
-data/raw/untreated_CU_met/[metabolomics_files]
+# Sample metadata
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Supplemental/SAP_accession_metadata.csv
 
-# Figure-specific processed datasets
-data/processed/Fig[1-8]/[analysis_specific_files]
+# Disease phenotype data
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/raw/field_data/SGM_DATA.csv
 ```
 
 ## Key Analysis Pipeline
@@ -212,12 +245,15 @@ library(viridis)
 git clone https://github.com/username/SAP_metabolomics.git
 cd SAP_metabolomics
 
-# Create data directory structure
+# Option A: Download entire dataset (recommended)
+aws s3 sync s3://sapmet/SAP_Metabolomics/ ./SAP_Metabolomics
+
+# Option B: Create structure and download individual files
 mkdir -p data/raw/{treated_TAMU_met,untreated_CU_met}
 mkdir -p data/processed/{Fig1,Fig2,Fig3,Fig4,Fig5,Fig6,Fig7,Fig8,Supplemental}
 
-# Download required datasets (example)
-wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/SAP19_MET_V4_ImputeChecks_NoBlanks.csv \
+# Download key files individually
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/processed/Fig1/SAP19_MET_V4_ImputeChecks_NoBlanks.csv \
      -P data/processed/Fig1/
 ```
 
@@ -347,4 +383,6 @@ For questions about the methodology or code implementation:
 
 - **Primary Contact**: Arlyn Ackerman (aja294@cornell.edu)
 - **Issues**: Submit via GitHub Issues
+- **Methodology Questions**: See `docs/methodology.md` for detailed protocols
 
+---
