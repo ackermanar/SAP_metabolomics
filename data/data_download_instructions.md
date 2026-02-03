@@ -23,9 +23,15 @@ curl -O https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/filename
 
 Replace `filename` with the specific file you need from the directory structure below.
 
+**For example, to download the SAP met data:**
+
+
 ### Option 2: Download Entire Dataset via AWS CLI (Recommended)
 
 For the complete dataset, use AWS CLI:
+'''bash
+wget https://sapmet.s3.us-east-2.amazonaws.com/SAP_Metabolomics/data/raw/untreated_CU_met/RAW_RESULTS_Sorghum_Grain_810_Samples_1M_cutoff_08082020.xlsx
+'''
 
 ```bash
 aws s3 sync s3://sapmet/SAP_Metabolomics/ ./SAP_Metabolomics
