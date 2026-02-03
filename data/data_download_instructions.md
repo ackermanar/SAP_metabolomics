@@ -1,4 +1,3 @@
-```
 # Data Directory
 
 This directory contains the data structure for the SAP Metabolomics project, but **NO DATA FILES ARE STORED IN THIS REPOSITORY**.
